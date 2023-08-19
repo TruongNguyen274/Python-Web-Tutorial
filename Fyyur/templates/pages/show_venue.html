@@ -1,0 +1,156 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Fyyur</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <style>
+            ul li {
+                list-style: none;
+            }
+            a {
+                text-decoration: none;
+                display: flex;
+                justify-content: space-between;
+            }
+            a button {
+                border: none;
+                background-color: white;
+                color: red;
+                font-size: 12px;
+                float: right;
+                cursor: pointer;
+            }
+            a button:hover {
+                background-color: blue;
+            }
+            form {
+                display: flex;
+            }
+            .error {
+                color: red;
+                display: none;
+            }
+            .error.active {
+                display: block;
+            }
+        </style>
+    </head>
+    <body>
+        <br />
+        <div class="container">
+            {% include '/layouts/navbar.html' %}
+            <div class="row mt-3">
+                <div class="col-sm-6">
+                    <h1 class="monospace">{{ venue.name }}</h1>
+                    <p class="subtitle">ID: {{ venue.id }}</p>
+                    <div class="form-group mt-3 mb-3">
+                        <h6>
+                            Genres: {% for genre in venue.genres %}
+                            <span class="alert alert-dark" style="padding: 0.4rem 0.5rem !important">{{ genre }}</span>
+                            {% endfor %}
+                        </h6>
+                    </div>
+                    <div class="form-group mb-2">
+                        <h6>City & State: {{ venue.city }}, {{ venue.state }}</h6>
+                    </div>
+                    <div class="form-group mb-2">
+                        <h6>Address: {% if venue.address %}{{ venue.address }}{% else %}No Address{% endif %}</h6>
+                    </div>
+                    <div class="form-group mb-2">
+                        <h6>Phone: {% if venue.phone %}{{ venue.phone }}{% else %}No Phone{% endif %}</h6>
+                    </div>
+                    <div class="form-group mb-2">
+                        <h6 class="d-flex">
+                            Website: {% if venue.website %}<a href="{{ venue.website }}" class="ms-2" target="_blank"
+                                >{{ venue.website }}</a
+                            >{% else %}No Website{% endif %}
+                        </h6>
+                    </div>
+                    <div class="form-group mb-2">
+                        <h6 class="d-flex">
+                            Facebook: {% if venue.facebook_link %}<a
+                                href="{{ venue.facebook_link }}"
+                                class="ms-2"
+                                target="_blank"
+                                >{{ venue.facebook_link }}</a
+                            >{% else %}No Facebook Link{% endif %}
+                        </h6>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <img src="{{ venue.image_link }}" style="width: 300px" alt="Venue Image" />
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <div class="form-group mb-2">
+                        <h4 class="monospace">
+                            {{ venue.upcoming_shows|count }} Upcoming {% if venue.upcoming_shows|count == 1 %}Show{%
+                            else %}Shows{% endif %}
+                        </h4>
+                        <div class="row">
+                            {%for show in venue.upcoming_shows %}
+                            <div class="col-sm-6">
+                                <div class="card text-center">
+                                    <div style="text-align: center">
+                                        <img
+                                            src="{{ show.artist.image_link }}"
+                                            style="width: 150px; padding: 10px"
+                                            class="card-img-top"
+                                            alt="..."
+                                        />
+                                    </div>
+                                    <div class="card-body text-center">
+                                        <p>
+                                            <a href="/artists/{{ show.artist_id }}" class="fw-bold d-block"
+                                                >{{ show.artist.name }}</a
+                                            >
+                                        </p>
+                                        <p class="card-title">{{ show.start_time.strftime("%m/%d/%Y") }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-2">
+                        <h4 class="monospace">
+                            {{ venue.past_shows|count }} Past {% if venue.past_shows|count == 1 %}Show{% else %}Shows{%
+                            endif %}
+                        </h4>
+                        <div class="row">
+                            {%for show in venue.past_shows %}
+                            <div class="col-sm-6">
+                                <div class="card text-center">
+                                    <div style="text-align: center">
+                                        <img
+                                            src="{{ show.artist.image_link }}"
+                                            style="width: 150px; padding: 10px"
+                                            class="card-img-top"
+                                            alt="..."
+                                        />
+                                    </div>
+                                    <div class="card-body text-center">
+                                        <p>
+                                            <a href="/artists/{{ show.artist_id }}" class="fw-bold d-block"
+                                                >{{ show.artist.name }}</a
+                                            >
+                                        </p>
+                                        <p class="card-title">{{ show.start_time.strftime("%m/%d/%Y") }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"></script>
+    </body>
+</html>
