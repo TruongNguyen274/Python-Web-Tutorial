@@ -16,11 +16,11 @@ pip install -r requirements.txt
 
 #### Key Pip Dependencies
 
-- [Flask](http://flask.pocoo.org/) is a lightweight backend microservices framework. Flask is required to handle requests and responses.
+-   [Flask](http://flask.pocoo.org/) is a lightweight backend microservices framework. Flask is required to handle requests and responses.
 
-- [SQLAlchemy](https://www.sqlalchemy.org/) is the Python SQL toolkit and ORM we'll use to handle the lightweight SQL database. You'll primarily work in `app.py`and can reference `models.py`.
+-   [SQLAlchemy](https://www.sqlalchemy.org/) is the Python SQL toolkit and ORM we'll use to handle the lightweight SQL database. You'll primarily work in `app.py`and can reference `models.py`.
 
-- [Flask-CORS](https://flask-cors.readthedocs.io/en/latest/#) is the extension we'll use to handle cross-origin requests from our frontend server.
+-   [Flask-CORS](https://flask-cors.readthedocs.io/en/latest/#) is the extension we'll use to handle cross-origin requests from our frontend server.
 
 ### Set up the Database
 
@@ -48,45 +48,160 @@ flask run --reload
 
 The `--reload` flag will detect file changes and restart the server automatically.
 
-## To Do Tasks
+## Documenting Endpoints
 
-These are the files you'd want to edit in the backend:
+### Endpoints
 
-1. `backend/flaskr/__init__.py`
-2. `backend/test_flaskr.py`
+**GET /categories**
 
-One note before you delve into your tasks: for each endpoint, you are expected to define the endpoint and response data. The frontend will be a plentiful resource because it is set up to expect certain endpoints and response data formats already. You should feel free to specify endpoints in your own way; if you do so, make sure to update the frontend or you will get some unexpected behavior.
+General:
 
-1. Use Flask-CORS to enable cross-domain requests and set response headers.
-2. Create an endpoint to handle `GET` requests for questions, including pagination (every 10 questions). This endpoint should return a list of questions, number of total questions, current category, categories.
-3. Create an endpoint to handle `GET` requests for all available categories.
-4. Create an endpoint to `DELETE` a question using a question `ID`.
-5. Create an endpoint to `POST` a new question, which will require the question and answer text, category, and difficulty score.
-6. Create a `POST` endpoint to get questions based on category.
-7. Create a `POST` endpoint to get questions based on a search term. It should return any questions for whom the search term is a substring of the question.
-8. Create a `POST` endpoint to get questions to play the quiz. This endpoint should take a category and previous question parameters and return a random questions within the given category, if provided, and that is not one of the previous questions.
-9. Create error handlers for all expected errors including 400, 404, 422, and 500.
+-   Returns a list of categories, success value
+-   Results are paginated in groups of 10. Include a request argument to choose page number, starting from 1.
 
-## Documenting your Endpoints
+-   Sample: `curl http://127.0.0.1:5000/categories`
 
-You will need to provide detailed documentation of your API endpoints including the URL, request parameters, and the response body. Use the example below as a reference.
+-   Result :
 
-### Documentation Example
-
-`GET '/api/v1.0/categories'`
-
-- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
-- Request Arguments: None
-- Returns: An object with a single key, `categories`, that contains an object of `id: category_string` key: value pairs.
-
-```json
+```
 {
-  "1": "Science",
-  "2": "Art",
-  "3": "Geography",
-  "4": "History",
-  "5": "Entertainment",
-  "6": "Sports"
+  "categories": {
+    "1": "Science",
+    "2": "Art",
+    "3": "Geography",
+    "4": "History",
+    "5": "Entertainment",
+    "6": "Sports"
+  },
+  "success": true
+}
+```
+
+**DELETE /questions/{id}**
+
+General:
+
+-   Deletes the question of the given ID if it exists. Returns success value.
+
+Sample `curl -X DELETE http://127.0.0.1:5000/questions/1`
+
+```
+{
+  "success": true
+}
+```
+
+**POST /questions/{id}**
+
+General:
+
+-   Creates a new question using the submitted title, answer, category and difficulty. Returns the id of the created question id, success value, total questions number, and questions list based on current page number to update the frontend
+
+Sample: `curl http://127.0.0.1:5000/questions -X POST -H "Content-Type: application/json" -d '{"question":"What was the name of the first man-made satellite launched by the Soviet Union in 1957?", "answer": "Sputnik 1","category" :"1", "difficulty":"2"}'`
+
+```
+{
+  "success": True,
+}
+```
+
+**POST /search**
+
+General:
+
+-   search for a question using the submitted search term. Returns the results, success value, total questions.
+
+Sample `curl http://127.0.0.1:5000/search -X POST -H "Content-Type: application/json" -d '{"searchTerm":"who"}'`
+
+```
+{
+  "questions": [
+    {
+      "answer": "Maya Angelou",
+      "category": "4",
+      "difficulty": 2,
+      "id": 5,
+      "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+    },
+    {
+      "answer": "George Washington Carver",
+      "category": "4",
+      "difficulty": 2,
+      "id": 12,
+      "question": "Who invented Peanut Butter?"
+    },
+    {
+      "answer": "Alexander Fleming",
+      "category": "1",
+      "difficulty": 3,
+      "id": 21,
+      "question": "Who discovered penicillin?"
+    }
+  ],
+  "success": true,
+  "total_questions": 3
+}
+```
+
+**GET /categories/{id}/questions**
+
+General:
+
+-   Returns a list of questions, in the given category, category total_questions and success value
+-   Results are paginated in groups of 10. Include a request argument to choose page number, starting from 1.
+
+Sample: `curl http://127.0.0.1:5000/categories/3/questions`
+
+```
+{
+  "current_category": "Geography",
+  "questions": [
+    {
+      "answer": "Lake Victoria",
+      "category": "3",
+      "difficulty": 2,
+      "id": 13,
+      "question": "What is the largest lake in Africa?"
+    },
+    {
+      "answer": "The Palace of Versailles",
+      "category": "3",
+      "difficulty": 3,
+      "id": 14,
+      "question": "In which royal palace would you find the Hall of Mirrors?"
+    },
+    {
+      "answer": "Agra",
+      "category": "3",
+      "difficulty": 2,
+      "id": 15,
+      "question": "The Taj Mahal is located in which Indian city?"
+    }
+  ],
+  "success": true,
+  "total_questions": 3
+}
+```
+
+**POST /quizzes**
+
+General:
+
+-   recive the actual question and the category
+-   return the next question in the same category and success value.
+
+Sample` curl http://127.0.0.1:5000/quizzes -X POST -H "Content-Type: application/json" -d '{"quiz_category":{"type":"Geography","id":"3"}, "previous_questions":[13]}'`
+
+```
+{
+  "question": {
+    "answer": "Agra",
+    "category": "3",
+    "difficulty": 2,
+    "id": 15,
+    "question": "The Taj Mahal is located in which Indian city?"
+  },
+  "previousQuestion":[13, 15]
 }
 ```
 

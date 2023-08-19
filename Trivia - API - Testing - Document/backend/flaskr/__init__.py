@@ -17,14 +17,6 @@ def paginate_questions(request, selection):
     return current_questions
 
 
-def list_to_dict(datas):
-    result = {}
-    for data in datas:
-        result[data.id] = data.type
-
-    return result
-
-
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
@@ -48,7 +40,9 @@ def create_app(test_config=None):
             abort(404)
 
         # adding all categories to the dict
-        result = list_to_dict(categories)
+        result = {}
+        for data in categories:
+            result[data.id] = data.type
 
         return jsonify({
             'success': True,
@@ -61,19 +55,21 @@ def create_app(test_config=None):
         categories = Category.query.order_by(Category.id).all()
         pagination = paginate_questions(request, questions)
 
-        if len(questions) == 0 or len(pagination) == 0:
+        if len(questions) == 0:
             abort(404)
 
         try:
-            dict_categories = list_to_dict(categories)
+            dict_categories = {}
+            for data in categories:
+                dict_categories[data.id] = data.type
 
             return jsonify({
                 'questions': pagination,
-                'totalQuestions': len(questions),
+                'total_questions': len(questions),
                 'categories': dict_categories,
-                'currentCategory': 'History'
+                'current_category': 'Geography'
             })
-        except Exception:
+        except:
             abort(400)
 
     @app.route('/questions/<int:question_id>', methods=['DELETE'])
@@ -86,25 +82,25 @@ def create_app(test_config=None):
             return jsonify({
                 'success': True,
             })
-        except Exception:
+        except:
             abort(422)
 
     @app.route('/questions', methods=['POST'])
     def create_question():
-        body = request.get_json()
-        question = body.get('question')
-        answer = body.get('answer')
-        difficulty = body.get('difficulty')
-        category = body.get('category')
-
         try:
+            body = request.get_json()
+            question = body.get('question')
+            answer = body.get('answer')
+            difficulty = body.get('difficulty')
+            category = body.get('category')
+
             question = Question(question=question, answer=answer, category=category,
                                 difficulty=difficulty)
             question.insert()
             return jsonify({
                 'success': True,
             })
-        except Exception:
+        except:
             abort(422)
 
     @app.route('/search', methods=['POST'])
@@ -117,7 +113,7 @@ def create_app(test_config=None):
             return jsonify({
                 'success': True,
                 'questions': results,
-                'totalQuestions': len(questions)
+                'total_questions': len(questions)
             })
         else:
             abort(404)
@@ -133,7 +129,8 @@ def create_app(test_config=None):
                 return jsonify({
                     'success': True,
                     'questions': results,
-                    'totalQuestions': len(questions)
+                    'total_questions': len(questions),
+                    "current_category": category.type,
                 })
             else:
                 abort(404)
@@ -149,21 +146,20 @@ def create_app(test_config=None):
         try:
             category_id = quizCategory['id']
             if category_id == 0:
-                questions = Question.query.all()
+                questions = Question.query.filter(
+                    Question.id.notin_(previousQuestion)).all()
             else:
-                questions = Question.query.filter_by(
-                    category=category_id).all()
+                questions = Question.query.filter(
+                    Question.id.notin_(previousQuestion)).filter(
+                    Question.category == category_id).all()
+            question = None
+            if (questions):
+                question = random.choice(questions)
 
-            randomIndex = random.randint(0, len(questions)-1)
-            nextQuestion = questions[randomIndex]
-
-            while nextQuestion.id not in previousQuestion:
-                nextQuestion = questions[randomIndex]
-                return jsonify({
-                    'success': True,
-                    'question': nextQuestion.format(),
-                    'previousQuestion': previousQuestion
-                })
+            return jsonify({
+                'success': True,
+                'question': question.format(),
+            })
         except:
             abort(422)
 
@@ -172,7 +168,7 @@ def create_app(test_config=None):
         return jsonify({
             "success": False,
             "error": 400,
-            "message": "bad request"
+            "message": "Bad Request"
         }), 400
 
     @app.errorhandler(404)
@@ -180,7 +176,7 @@ def create_app(test_config=None):
         return jsonify({
             "success": False,
             "error": 404,
-            "message": "not found"
+            "message": "Not Found"
         }), 404
 
     @app.errorhandler(422)
@@ -188,7 +184,7 @@ def create_app(test_config=None):
         return jsonify({
             "success": False,
             "error": 422,
-            "message": "unprocessable"
+            "message": "Unprocessable"
         }), 422
 
     @app.errorhandler(500)
@@ -196,7 +192,7 @@ def create_app(test_config=None):
         return jsonify({
             "success": False,
             "error": 422,
-            "message": "internal server error"
+            "message": "Internal Server Error"
         }), 500
 
     return app

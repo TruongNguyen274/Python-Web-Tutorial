@@ -62,13 +62,9 @@ flask run --reload
 
 The `--reload` flag will detect file changes and restart the server automatically.
 
-## Frontend - Trivia API
+## Frontend
 
-### Getting Setup
-
-> _tip_: this frontend is designed to work with [Flask-based Backend](../backend) so it will not load successfully if the backend is not working or not connected. We recommend that you **stand up the backend first**, test using Postman or curl, update the endpoints in the frontend, and then the frontend should integrate smoothly.
-
-#### Installing Dependencies
+### Installing Dependencies
 
 1. **Installing Node and NPM**
    This project depends on Nodejs and Node Package Manager (NPM). Before continuing, you must download and install Node (the download includes NPM) from [https://nodejs.com/en/download](https://nodejs.org/en/download/).
@@ -80,11 +76,13 @@ The `--reload` flag will detect file changes and restart the server automaticall
 npm install
 ```
 
-> _tip_: `npm i`is shorthand for `npm install``
+    or
 
-### Required Tasks
+```bash
+npm i
+```
 
-#### Running Your Frontend in Dev Mode
+### Running Your Frontend in Dev Mode
 
 The frontend app was built using create-react-app. In order to run the app in development mode use `npm start`. You can change the script in the `package.json` file.
 
@@ -97,3 +95,157 @@ npm start
 ## API Reference
 
 ### Endpoints
+
+**GET /categories**
+
+General:
+
+-   Returns a list of categories, success value
+-   Results are paginated in groups of 10. Include a request argument to choose page number, starting from 1.
+
+-   Sample: `curl http://127.0.0.1:5000/categories`
+
+-   Result :
+
+```
+{
+  "categories": {
+    "1": "Science",
+    "2": "Art",
+    "3": "Geography",
+    "4": "History",
+    "5": "Entertainment",
+    "6": "Sports"
+  },
+  "success": true
+}
+```
+
+**DELETE /questions/{id}**
+
+General:
+
+-   Deletes the question of the given ID if it exists. Returns success value.
+
+Sample `curl -X DELETE http://127.0.0.1:5000/questions/1`
+
+```
+{
+  "success": true
+}
+```
+
+**POST /questions/{id}**
+
+General:
+
+-   Creates a new question using the submitted title, answer, category and difficulty. Returns the id of the created question id, success value, total questions number, and questions list based on current page number to update the frontend
+
+Sample: `curl http://127.0.0.1:5000/questions -X POST -H "Content-Type: application/json" -d '{"question":"What was the name of the first man-made satellite launched by the Soviet Union in 1957?", "answer": "Sputnik 1","category" :"1", "difficulty":"2"}'`
+
+```
+{
+  "success": True,
+}
+```
+
+**POST /search**
+
+General:
+
+-   search for a question using the submitted search term. Returns the results, success value, total questions.
+
+Sample `curl http://127.0.0.1:5000/search -X POST -H "Content-Type: application/json" -d '{"searchTerm":"who"}'`
+
+```
+{
+  "questions": [
+    {
+      "answer": "Maya Angelou",
+      "category": "4",
+      "difficulty": 2,
+      "id": 5,
+      "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+    },
+    {
+      "answer": "George Washington Carver",
+      "category": "4",
+      "difficulty": 2,
+      "id": 12,
+      "question": "Who invented Peanut Butter?"
+    },
+    {
+      "answer": "Alexander Fleming",
+      "category": "1",
+      "difficulty": 3,
+      "id": 21,
+      "question": "Who discovered penicillin?"
+    }
+  ],
+  "success": true,
+  "total_questions": 3
+}
+```
+
+**GET /categories/{id}/questions**
+
+General:
+
+-   Returns a list of questions, in the given category, category total_questions and success value
+-   Results are paginated in groups of 10. Include a request argument to choose page number, starting from 1.
+
+Sample: `curl http://127.0.0.1:5000/categories/3/questions`
+
+```
+{
+  "current_category": "Geography",
+  "questions": [
+    {
+      "answer": "Lake Victoria",
+      "category": "3",
+      "difficulty": 2,
+      "id": 13,
+      "question": "What is the largest lake in Africa?"
+    },
+    {
+      "answer": "The Palace of Versailles",
+      "category": "3",
+      "difficulty": 3,
+      "id": 14,
+      "question": "In which royal palace would you find the Hall of Mirrors?"
+    },
+    {
+      "answer": "Agra",
+      "category": "3",
+      "difficulty": 2,
+      "id": 15,
+      "question": "The Taj Mahal is located in which Indian city?"
+    }
+  ],
+  "success": true,
+  "total_questions": 3
+}
+```
+
+**POST /quizzes**
+
+General:
+
+-   recive the actual question and the category
+-   return the next question in the same category and success value.
+
+Sample` curl http://127.0.0.1:5000/quizzes -X POST -H "Content-Type: application/json" -d '{"quiz_category":{"type":"Geography","id":"3"}, "previous_questions":[13]}'`
+
+```
+{
+  "question": {
+    "answer": "Agra",
+    "category": "3",
+    "difficulty": 2,
+    "id": 15,
+    "question": "The Taj Mahal is located in which Indian city?"
+  },
+  "success": true,
+  "previousQuestion":[13, 15]
+}
+```
